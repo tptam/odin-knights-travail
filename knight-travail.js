@@ -38,17 +38,16 @@ function getLinks(square) {
     .map(({ x, y }) => board[x][y]);
 }
 
-function knightMoves(startXY, goalXY, pretty = false) {
+function knightMoves(startXY, goalXY) {
   const start = board[startXY[0]][startXY[1]];
   const goal = board[goalXY[0]][goalXY[1]];
   const route = getKnightMoves(start, goal);
-  console.log(getRouteString(route));
-  if (pretty) {
-    prettyRoute(route);
-  }
+  prettyRoute(route);
 }
 
 function getKnightMoves(start, goal) {
+  // prev property serves both as the "visited" marker for BFS
+  // and the pointer for the linked-list of the route
   resetPrev();
   start.prev = null;
   const discovered = [start];
@@ -58,8 +57,6 @@ function getKnightMoves(start, goal) {
       break;
     }
     for (let link of current.links) {
-      // prev property serves both as the "visited" marker for BFS
-      // and the pointer for the linked-list of the route
       if (link.prev === undefined) {
         link.prev = current;
         discovered.push(link);
@@ -81,13 +78,15 @@ function getRouteArray(square) {
 
 function getRouteString(route) {
   let result = route.reduce(
-    (acc, current) => `${acc}[${current.x},${current.y}],`,
+    (acc, current) => `${acc}[${current.x},${current.y}]` + "\n",
     ""
   );
-  return `[${result.slice(0, -1)}]`;
+  return result.slice(0, -1);
 }
 
 function prettyRoute(route) {
+  console.log(`You made it in ${route.length - 1} moves!  Here's your path:`);
+  console.log(getRouteString(route));
   const result = [];
   for (let i = 0; i < SIZE; i++) {
     result.push(Array(SIZE).fill("[  ]"));
